@@ -18,16 +18,21 @@
 
 typedef struct pinfo
 {
+    int id;
     int num_of_philo;
     int time_to_die;
     int time_to_eat;
     int time_to_sleep;
     int freq;
+    pthread_t thread;
+    pthread_mutex_t lfork;
+    pthread_mutex_t rfork;
+
 }   s_info;
 
-void* rout()
+void* rout(void *s)
 {
-    printf("\n\nhello world!!!!\n\n");
+    printf("\n\nhello world and id is %d!!!!\n\n",s->id);
     // write(1,"hhh",3);
 }
 
@@ -80,20 +85,45 @@ int errcheck(int ac, char **agv)
 int main(int ac, char **agv)
 {
     s_info *s;
+    int     i;
 
     if(errcheck(ac,agv))
     {
         printf("error\n");
         return (0);
     }
-    s = malloc(sizeof(s_info));
-    s->num_of_philo = ft_atoi(agv[1]);
-    s->time_to_die = ft_atoi(agv[2]);
-    s->time_to_eat = ft_atoi(agv[3]);
-    s->time_to_sleep = ft_atoi(agv[4]);
-    if(ac == 6)
-        s->freq = ft_atoi(agv[5]);
-    
+    i = 0;
+    s = malloc(sizeof(s_info) * ft_atoi(agv[1]));
+    while (i < ft_atoi(agv[1]))
+    {
+        s[i].num_of_philo = ft_atoi(agv[1]);
+        s[i].time_to_die = ft_atoi(agv[2]);
+        s[i].time_to_eat = ft_atoi(agv[3]);
+        s[i].time_to_sleep = ft_atoi(agv[4]);
+        s[i].id = i+1;
+        pthread_mutex_init(&s[i].lfork,NULL);
+        pthread_mutex_init(&s[i].rfork,NULL);
+        if(ac == 6)
+            s[i].freq = ft_atoi(agv[5]);
+        else
+            s[i].freq=-1;
+        i++;
+    }
+    i = 0;
+    // printf("agv[1] val %d\n",ft_atoi(agv[1]));
+    // while(i<ft_atoi(agv[1]))
+    // {
+    //     printf("id is %d\n",s[i].id);
+    //     i++;
+    // }
+    while(i<ft_atoi(agv[1]))
+    {
+        pthread_create(&s[i].thread, NULL, s)
+
+        i++;
+    }
+
+    free(s);
     return (0);
     
 }
