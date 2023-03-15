@@ -32,8 +32,12 @@ typedef struct pinfo
 
 void* rout(void *s)
 {
-    printf("\n\nhello world and id is %d!!!!\n\n",s->id);
-    // write(1,"hhh",3);
+    s_info *philo;
+
+    philo = (s_info *)s;
+    printf("\n\nhello world and id is %d!!!!\n\n",philo->id);
+    // write(1,"mynameis",8);
+    free(s);
 }
 
 int	ft_atoi(const char *str)
@@ -118,11 +122,24 @@ int main(int ac, char **agv)
     // }
     while(i<ft_atoi(agv[1]))
     {
-        pthread_create(&s[i].thread, NULL, s)
-
+        s_info *q = malloc(sizeof(s_info));
+        *q = s[i];
+        if(pthread_create(&s[i].thread, NULL, &rout, q))
+        {
+            printf("create prob\n");
+            free (s);
+            return (0);
+        }
+        printf("hhh\n");
         i++;
     }
-
+    i = 0;
+    while(i<ft_atoi(agv[1]))
+    {
+        if(pthread_join(s[i].thread,NULL))
+            return (0);
+        i++;
+    }
     free(s);
     return (0);
     
