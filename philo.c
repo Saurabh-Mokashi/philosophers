@@ -70,12 +70,12 @@ void single_philo(s_info *philo)
 void* rout(void *s)
 {
     s_info *philo;
-    g_info *g;
+    g_info *comm;
     // long time;
     // time = philo->time.tv_sec;
 
     philo = (s_info *)s;
-    g=philo->g;
+    comm=(g_info *)philo->g;
     // usleep(100);
     // printf("\n\nhello world and id is %d!!!!\n",philo->id);
     // printf("died\n");
@@ -84,16 +84,17 @@ void* rout(void *s)
     // free(philo);
 
     //main code crux
+        printf("%d\n",philo->id);
         printf("hi\n");
-        printf("%d\n",g->num_of_philo);
-    if(g->num_of_philo == 1)
+        printf("%d\n",comm->freq);
+    if(comm->num_of_philo == 1)
     {
         printf("bye\n");
         single_philo(philo);
     }
     // else
     //     multiphilo(philo);
-    return (s);
+    // return NULL;
 }
 
 int	ft_atoi(const char *str)
@@ -208,10 +209,12 @@ int main(int ac, char **agv)
     //     i++;
     // }
     i = 0;
+    // printf("comis %d\n",comm->num_of_philo);
     while(i<ft_atoi(agv[1]))
     {
         // s_info *q = malloc(sizeof(s_info));
         // *q = s[i];
+        // printf("abt to create thread\n");
         if(pthread_create(&s[i].thread, NULL, &rout, &s[i]))
         {
             printf("create prob\n");
