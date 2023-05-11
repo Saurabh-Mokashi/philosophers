@@ -50,7 +50,77 @@ void death(s_info *philo,int i)
 
     g=philo->g;
     printf("%d %d died\n",g->time_to_die+1,philo[i].id);
-    printf("bye\n");
+    // printf("bye\n");
+}
+
+long getcurrtime(s_info *philo)
+{
+    struct timeval curr_time;
+    long time;
+    gettimeofday(&curr_time, NULL);
+    time = time_in_ms(philo, curr_time);
+    return (time);
+}
+
+
+void sleepy(s_info *philo)
+{
+    printf("\ngo back to sleep!!");
+}
+
+void lockprint(s_info *philo, int choice)
+{
+    printf("\nIn lock print yo!!");
+}
+
+void freefork(s_info *philo)
+{
+    if((philo->id)%2==0)
+    {
+        pthread_mutex_unlock(philo->rfork);
+        pthread_mutex_unlock(&philo->lfork);
+    }
+    else
+    {
+        pthread_mutex_unlock(&philo->lfork);
+        pthread_mutex_unlock(philo->rfork);
+    }
+}
+void takefork(s_info *philo)
+{
+    if((philo->id)%2==0)
+    {
+        pthread_mutex_lock(&philo->lfork);
+        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        pthread_mutex_lock(philo->rfork);
+        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+    }
+    else
+    {
+        pthread_mutex_lock(philo->rfork);
+        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        pthread_mutex_lock(&philo->lfork);
+        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+    }
+}
+
+void multiphilo(s_info *philo)
+{
+    // struct timeval curr_time;
+    // long time;
+
+    // gettimeofday(&curr_time, NULL);
+    // time = time_in_ms(philo, curr_time);
+    // printf("time is %ld\n",time);//prolly need mutex for time calc.
+    // while(1){
+    takefork(philo);
+    lockprint(philo,3);
+    freefork(philo);
+    sleepy(philo);
+    lockprint(philo,4);
+    // }
+    return ;
+
 }
 
 void single_philo(s_info *philo)
@@ -75,7 +145,7 @@ void* rout(void *s)
     // time = philo->time.tv_sec;
 
     philo = (s_info *)s;
-    comm=(g_info *)philo->g;
+    comm = (g_info *)philo->g;
     // usleep(100);
     // printf("\n\nhello world and id is %d!!!!\n",philo->id);
     // printf("died\n");
@@ -84,17 +154,14 @@ void* rout(void *s)
     // free(philo);
 
     //main code crux
-        printf("%d\n",philo->id);
-        printf("hi\n");
-        printf("%d\n",comm->freq);
+        // printf("%d\n",philo->id);
+        // printf("hi\n");
+        // printf("%d\n",comm->num_of_philo);
     if(comm->num_of_philo == 1)
-    {
-        printf("bye\n");
         single_philo(philo);
-    }
-    // else
-    //     multiphilo(philo);
-    // return NULL;
+    else
+        multiphilo(philo);
+    return NULL;
 }
 
 int	ft_atoi(const char *str)
@@ -190,6 +257,7 @@ int main(int ac, char **agv)
         s[i].id = i+1;
         pthread_mutex_init(&s[i].lfork,NULL);
         s[i].rfork = NULL;
+        s[i].g=comm;
         gettimeofday(&s[i].s_time,NULL);
         i++;
     }
@@ -210,6 +278,7 @@ int main(int ac, char **agv)
     // }
     i = 0;
     // printf("comis %d\n",comm->num_of_philo);
+    // printf("\n\n%d\n\n",comm->num_of_philo);
     while(i<ft_atoi(agv[1]))
     {
         // s_info *q = malloc(sizeof(s_info));
