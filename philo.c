@@ -32,6 +32,7 @@ typedef struct pinfo
     pthread_t thread;
     pthread_mutex_t lfork;
     pthread_mutex_t *rfork;
+    pthread_mutex_t print;
     struct timeval s_time;  
     struct ginfo *g;
 }   s_info;
@@ -70,7 +71,15 @@ void sleepy(s_info *philo)
 
 void lockprint(s_info *philo, int choice)
 {
-    printf("\nIn lock print yo!!");
+    pthread_mutex_lock(&philo->print);
+    if(choice == 2)
+        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+    if(choice == 3)
+        printf("%ld %d is eating\n",getcurrtime(philo),philo->id);
+    if(choice == 4)
+        printf("%ld %d is sleeping\n",getcurrtime(philo),philo->id);
+    pthread_mutex_unlock(&philo->print);
+    
 }
 
 void freefork(s_info *philo)
@@ -78,12 +87,18 @@ void freefork(s_info *philo)
     if((philo->id)%2==0)
     {
         pthread_mutex_unlock(philo->rfork);
+        lockprint(philo,2);
+        // printf("%ld %d has released a fork\n",getcurrtime(philo),philo->id);
         pthread_mutex_unlock(&philo->lfork);
+        lockprint(philo,2);
+        // printf("%ld %d has released a fork\n",getcurrtime(philo),philo->id);
     }
     else
     {
         pthread_mutex_unlock(&philo->lfork);
+        // printf("%ld %d has released a fork\n",getcurrtime(philo),philo->id);
         pthread_mutex_unlock(philo->rfork);
+        // printf("%ld %d has released a fork\n",getcurrtime(philo),philo->id);
     }
 }
 void takefork(s_info *philo)
@@ -91,16 +106,20 @@ void takefork(s_info *philo)
     if((philo->id)%2==0)
     {
         pthread_mutex_lock(&philo->lfork);
-        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        // printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        lockprint(philo,2);
         pthread_mutex_lock(philo->rfork);
-        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        lockprint(philo,2);
+        // printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
     }
     else
     {
         pthread_mutex_lock(philo->rfork);
-        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        lockprint(philo,2);
+        // printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
         pthread_mutex_lock(&philo->lfork);
-        printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
+        lockprint(philo,2);
+        // printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
     }
 }
 
@@ -116,7 +135,7 @@ void multiphilo(s_info *philo)
     takefork(philo);
     lockprint(philo,3);
     freefork(philo);
-    sleepy(philo);
+    // sleepy(philo);
     lockprint(philo,4);
     // }
     return ;
@@ -256,6 +275,7 @@ int main(int ac, char **agv)
     {
         s[i].id = i+1;
         pthread_mutex_init(&s[i].lfork,NULL);
+        pthread_mutex_init(&s[i].print,NULL);
         s[i].rfork = NULL;
         s[i].g=comm;
         gettimeofday(&s[i].s_time,NULL);
