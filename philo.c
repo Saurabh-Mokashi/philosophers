@@ -71,6 +71,7 @@ void sleepy(s_info *philo)
 
 void lockprint(s_info *philo, int choice)
 {
+    // printf("in lock print\n");
     pthread_mutex_lock(&philo->print);
     if(choice == 2)
         printf("%ld %d has taken a fork\n",getcurrtime(philo),philo->id);
@@ -79,7 +80,7 @@ void lockprint(s_info *philo, int choice)
     if(choice == 4)
         printf("%ld %d is sleeping\n",getcurrtime(philo),philo->id);
     pthread_mutex_unlock(&philo->print);
-    
+    // printf("end of lock print\n");
 }
 
 void freefork(s_info *philo)
@@ -307,8 +308,8 @@ int main(int ac, char **agv)
         if(pthread_create(&s[i].thread, NULL, &rout, &s[i]))
         {
             printf("create prob\n");
-            free (s);
-            free(comm);
+                            // free (s);
+                            // free(comm);
             return (0);
         }
         // usleep(100);
@@ -320,13 +321,13 @@ int main(int ac, char **agv)
     {
         if(pthread_join(s[i].thread,NULL))
         {
-            free(s);
-            free(comm);
+                            // free(s);
+                            // free(comm);
             return (0);
         }
         i++;
     }
-    free(s);
-    free(comm);
+                            // free(s);
+                            // free(comm);
     return (0);
 }
